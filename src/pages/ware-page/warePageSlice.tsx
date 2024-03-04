@@ -8,11 +8,14 @@ import {apiGetItems} from "~/api/models/ApiCalls.ts";
 export interface WareSlice {
     items: WithLoader<Item[]>
 
+    page: number
+
     getItems: (page: number) => Promise<void>
 }
 
 export const createWareSlice: StateCreator<WareSlice> = set => ({
-    items: {loading: LoadingState.NOT_STARTED},
+    items: {data: [], loading: LoadingState.LOADING},
+    page: 1,
     getItems: async (page: number) => {
         try {
             const response = await apiGetItems(page)
@@ -20,7 +23,7 @@ export const createWareSlice: StateCreator<WareSlice> = set => ({
             const statusCode = response.status
 
             if (statusCode === 200) {
-                const {items}: {items: any[]} = response.data
+                const {items}: { items: any[] } = response.data
                 const parsedItems = items.map(({
                                                    item_id: id,
                                                    item_name: name,
@@ -40,17 +43,34 @@ export const createWareSlice: StateCreator<WareSlice> = set => ({
                     availableQuantity,
                     totalQuantity
                 }))
-                set(_state => ({items: {data: parsedItems, loading: LoadingState.LOADED, statusCode}}))
+                set(_state => ({
+                    ..._state,
+                    page: _state.page + 1,
+                    items: {
+                        data: _state.items.data?.concat(parsedItems),
+                        loading: LoadingState.LOADED,
+                        statusCode
+                    }
+                }))
             }
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 if (error.response !== undefined) {
                     const statusCode = error.response.status
-                    set(_state => ({items: {loading: LoadingState.ERROR, statusCode}}))
+                    set(_state => ({
+                        ..._state,
+                        items: {data: _state.items.data, loading: LoadingState.ERROR, statusCode}
+                    }))
                 }
             }
-            //TODO Check it doesn't affect the usability
-            throw new Error("Unexpected error")
+            set(_state => ({
+                ..._state,
+                items: {
+                    data: _state.items.data,
+                    loading: LoadingState.ERROR,
+                    statusCode: 404
+                }
+            }))
         }
     }
 })

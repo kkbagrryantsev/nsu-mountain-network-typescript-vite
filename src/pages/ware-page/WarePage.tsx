@@ -7,7 +7,7 @@ export const WarePage = () => {
     const getItems = useBoundStore(state => state.getItems)
     useEffect(() => {
         void getItems(1)
-    }, [getItems]);
+    }, [getItems])
 
     return <div>
         <Header/>
