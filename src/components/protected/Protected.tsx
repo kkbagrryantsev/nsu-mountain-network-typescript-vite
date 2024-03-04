@@ -9,7 +9,7 @@ interface ProtectedProps {
 }
 
 export const Protected = (props: ProtectedProps) => {
-    const {isAuthenticated, hasRole, children} = props
+    const {isAuthenticated, children} = props
     const authenticationStatus = useAuthenticationStatus()
 
     let flag = true;

@@ -3,6 +3,7 @@ import {relativePaths} from "~/relativePaths.ts";
 import {Protected} from "~/components/protected/Protected.tsx";
 import useBoundStore from "~/store/useBoundStore.ts";
 import {AuthModal} from "~/pages/AuthModal.tsx";
+import {RegisterModal} from "~/pages/RegisterModal.tsx";
 
 export const Header = () => {
     const openModal = useBoundStore(state => state.openModal)
@@ -12,13 +13,14 @@ export const Header = () => {
             <a href={relativePaths.INDEX}>
                 <img src={logo} alt={'Логотип клуба горного туризма НГУ'}/>
             </a>
-            <Protected isAuthenticated={false}>
+            <Protected isAuthenticated={true}>
                 <a href={relativePaths.EQUIPMENT}>Снаряжение</a>
             </Protected>
         </div>
         <Protected isAuthenticated={false}>
             <button onClick={() => openModal('authModal')}>Войти</button>
             <AuthModal/>
+            <RegisterModal/>
         </Protected>
     </div>
 }

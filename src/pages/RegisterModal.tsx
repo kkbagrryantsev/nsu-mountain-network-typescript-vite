@@ -5,69 +5,84 @@ import {yupResolver} from "@hookform/resolvers/yup";
 import useBoundStore from "~/store/useBoundStore.ts";
 import {useState} from "react";
 
-export const AuthModal = () => {
-    return <Modal id={'authModal'}>
+export const RegisterModal = () => {
+    return <Modal id={'registerModal'}>
         <div className={"bg-white w-80 p-6 rounded-xl"}>
-            <AuthForm/>
+            <RegisterForm/>
         </div>
     </Modal>
 }
 
-type AuthFormData = {
+type RegisterFormData = {
+    name: string,
+    email: string,
+    phone: string,
     login: string,
     password: string
 }
 
-const authSchema = yup
+const registerSchema = yup
     .object({
+        name: yup.string().required(),
+        email: yup.string().email().required(),
+        phone: yup.string().required().max(20).required(),
         login: yup.string().required(),
         password: yup.string().required()
     })
     .required()
 
-const AuthForm = () => {
+const RegisterForm = () => {
     const {
         register,
         handleSubmit,
-    } = useForm<AuthFormData>(
+    } = useForm<RegisterFormData>(
         {
             defaultValues: {
+                name: "",
+                phone: "+7",
+                email: "",
                 login: "",
-                password: "",
+                password: ""
             },
-            resolver: yupResolver(authSchema)
+            resolver: yupResolver(registerSchema)
         }
     )
 
     const [responseStatus, setResponseStatus] = useState<number>()
 
-    const signIn = useBoundStore(state => state.signIn)
+    const signUp = useBoundStore(state => state.signUp)
 
     const convertStatusToReadableResponse = (status: any) => {
         switch (status) {
-            case 401:
-                return "Неверный логин или пароль"
+            case 403:
+                return "Пользователь с такими данными уже существует"
+            case 200:
+                return "Проверьте почту для подтверждения регистрации"
             case 500:
                 return "На сервере ошибка"
         }
     }
 
     const onSubmit = (data: any) => {
-        signIn(data).then(
+        signUp(data).then(
             responseStatus => setResponseStatus(responseStatus)
         )
-    }
-
-    const closeModal = useBoundStore(state => state.closeModal)
-    const openModal = useBoundStore(state => state.openModal)
-    const onRegisterButtonClick = () => {
-        closeModal('authModal')
-        openModal('registerModal')
     }
 
     return <form onSubmit={handleSubmit(onSubmit)}>
         <div className={"flex flex-col gap-10"}>
             <div className={"flex flex-col gap-2"}>
+                <input
+                    placeholder={"Имя"}
+                    className={"border-2 rounded-md w-full text-lg p-2 bg-gray-50 border-gray-200 focus:outline-blue-400"} {...register('name')}/>
+                <input
+                    placeholder={"Электропочта"}
+                    type={"email"}
+                    className={"border-2 rounded-md w-full text-lg p-2 bg-gray-50 border-gray-200 focus:outline-blue-400"} {...register('email')}/>
+                <input
+                    type={"tel"}
+                    placeholder={"Номер телефона"}
+                    className={"border-2 rounded-md w-full text-lg p-2 bg-gray-50 border-gray-200 focus:outline-blue-400"} {...register('phone')}/>
                 <input
                     placeholder={"Логин"}
                     className={"border-2 rounded-md w-full text-lg p-2 bg-gray-50 border-gray-200 focus:outline-blue-400"} {...register('login')}/>
@@ -76,17 +91,11 @@ const AuthForm = () => {
                        className={"border-2 rounded-md w-full text-lg p-2 bg-gray-50 border-gray-200 focus:outline-blue-400"} {...register('password')}/>
             </div>
             <div className={"flex flex-col gap-1 items-center"}>
-                <p className={"text-red-800"} hidden={!responseStatus}>
+                <p className={responseStatus !== 200 ? "text-red-800" : "text-green-600"} hidden={!responseStatus}>
                     {convertStatusToReadableResponse(responseStatus)}
                 </p>
-                <button className={"w-full"}>Войти</button>
-                <button onClick={onRegisterButtonClick} type={"button"}
-                        className={"text-gray-500 underline underline-offset-2 decoration-dashed text-sm hover:text-blue-700"}>
-                    Зарегистрироваться
-                </button>
+                <button className={"w-full"}>Зарегистрироваться</button>
             </div>
-
         </div>
-
     </form>
 }

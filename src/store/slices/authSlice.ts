@@ -1,15 +1,18 @@
-import { type StateCreator } from 'zustand'
-import { LoadingState } from '~/enums/LoadingState.ts'
+import {type StateCreator} from 'zustand'
+import {LoadingState} from '~/enums/LoadingState.ts'
 import axios from 'axios'
 import {WithLoader} from "~/utils/WithLoader.ts";
-import {apiCheckAuthentication, apiSignIn} from "~/api/auth/ApiCalls.ts";
+import {apiCheckAuthentication, apiSignIn, apiSignUp} from "~/api/auth/ApiCalls.ts";
+import {saveAccessToken} from "~/api/Cookie.ts";
 
 export interface AuthSlice {
     isAuthenticated: WithLoader<boolean>
 
     checkAuthentication: () => Promise<void>
 
-    signIn: (credentials: never) => Promise<void>
+    signIn: (credentials: any) => Promise<number>
+
+    signUp: (credentials: any) => Promise<number>
 }
 
 export const createAuthSlice: StateCreator<AuthSlice> = set => ({
@@ -18,6 +21,34 @@ export const createAuthSlice: StateCreator<AuthSlice> = set => ({
     signIn: async (credentials: string) => {
         try {
             const response = await apiSignIn(credentials)
+
+            const statusCode = response.status
+
+            if (statusCode === 200) {
+                const {access_token: accessToken} = response.data
+                saveAccessToken(accessToken)
+                set(_state => ({ isAuthenticated: { data: true, loading: LoadingState.LOADED, statusCode } }))
+            }
+
+            return statusCode
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                if (error.response !== undefined) {
+                    const statusCode = error.response.status
+                    set(_state => ({ isAuthenticated: { data: false, loading: LoadingState.ERROR, statusCode } }))
+                    return statusCode
+                }
+            }
+            //TODO Check it doesn't affect the usability
+            throw new Error("Unexpected error")
+        }
+    },
+
+    checkAuthentication: async () => {
+        try {
+            set(_state => ({ isAuthenticated: { data: true, loading: LoadingState.LOADING } }))
+
+            const response = await apiCheckAuthentication()
 
             const statusCode = response.status
 
@@ -37,39 +68,25 @@ export const createAuthSlice: StateCreator<AuthSlice> = set => ({
 
                 if (error.response !== undefined) {
                     const statusCode = error.response.status
-                    set(_state => ({ isAuthenticated: { data: false, loading: LoadingState.ERROR, statusCode } }))
+                    set(_state => ({ isAuthenticated: { data: true, loading: LoadingState.ERROR, statusCode } }))
                 }
             }
         }
     },
 
-    checkAuthentication: async () => {
+    signUp: async (credentials: any) => {
         try {
-            set(_state => ({ isAuthenticated: { data: true, loading: LoadingState.LOADING } }))
+            const response = await apiSignUp(credentials)
 
-            const response = await apiCheckAuthentication()
-
-            const data = response.data
-            const statusCode = response.status
-
-            // FIXME is authenticated has another check logic
-            set(_state => ({ isAuthenticated: { data, loading: LoadingState.LOADED, statusCode } }))
+            return response.status
         } catch (error) {
             if (axios.isAxiosError(error)) {
-                // TODO Remove debug
-                set(_state => ({
-                    isAuthenticated: {
-                        data: true,
-                        loading: LoadingState.LOADED,
-                        statusCode: 200
-                    }
-                }))
-
                 if (error.response !== undefined) {
-                    const statusCode = error.response.status
-                    set(_state => ({ isAuthenticated: { data: true, loading: LoadingState.ERROR, statusCode } }))
+                    return error.response.status
                 }
             }
+            //TODO Check it doesn't affect the usability
+            throw new Error("Unexpected error")
         }
-    }
+    },
 })

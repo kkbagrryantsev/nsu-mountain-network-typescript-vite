@@ -1,4 +1,12 @@
 import axios from "axios";
+import {getAccessToken} from "~/api/Cookie.ts";
+
+export const apiGetItems = (page: number) => axios.get(`/api/models/items?page=${page}`, {
+    headers: {
+        Authorization: `Bearer ${getAccessToken()}`,
+        'Content-Type': 'application/json'
+    }
+})
 
 // WAREHOUSEMAN OPTIONS, USERS OPERATIONS
 // export const apiGetAllUsers = () =>

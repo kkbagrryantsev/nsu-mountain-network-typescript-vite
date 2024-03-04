@@ -24,6 +24,18 @@ export const apiCheckAuthentication = () => axios.get('/api/protected/fromAny', 
     }
 })
 
+export const apiSignUp = (data: {
+    name: string,
+    phone: string,
+    email: string,
+    login: string,
+    password: string
+}) => axios.post(`/api/auth/signup`, data, {
+    headers: {
+        'Content-Type': 'application/json'
+    }
+})
+
 // export const apiResetPassword = (token) =>
 //     axios.post(`/api/auth/reset_password/${token}`, getJSONHeader());
 //
