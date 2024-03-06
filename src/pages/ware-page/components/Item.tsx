@@ -1,19 +1,21 @@
 import {Item} from "~/model/Item.ts";
+import {FaChevronRight} from "react-icons/fa";
+import {Protected} from "~/components/protected/Protected.tsx";
+import React from "react";
+import useBoundStore from "~/store/useBoundStore.ts";
+import {CostFormatter} from "~/utils/CostFormatter.ts";
 
 interface ItemComponentProps {
     item: Item
+    setModalId: React.Dispatch<any>
 }
 
 export const ItemComponent = (props: ItemComponentProps) => {
-    const costFormatter = new Intl.NumberFormat('ru-RU', {
-        style: "currency",
-        currency: "RUB",
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0
-    })
+    const openModal = useBoundStore(state => state.openModal)
 
-    const {item} = props
-    const {name, categoryId, totalQuantity, availableQuantity, cost, weight} = item
+    const {item, setModalId} = props
+    const {id, name, categoryId, totalQuantity, availableQuantity, cost, weight} = item
+
     return <div className={"flex flex-col gap-2 p-4 bg-gray-100 border border-gray-300 rounded-xl"}>
         <div className={"flex flex-row justify-between"}>
             <div className={"flex flex-col"}>
@@ -21,7 +23,7 @@ export const ItemComponent = (props: ItemComponentProps) => {
                     {name}
                 </div>
                 <div className={"text-sm"}>
-                    {categoryId}
+                    ID категории: {categoryId}
                 </div>
             </div>
             <div className={"flex flex-col text-right"}>
@@ -36,7 +38,7 @@ export const ItemComponent = (props: ItemComponentProps) => {
         <div className={"flex flex-row justify-between items-center"}>
             <div className={"flex flex-row text-sm gap-3"}>
                 <div className={"font-semibold"}>
-                    {costFormatter.format(cost)}
+                    {CostFormatter.format(cost)}
                 </div>
                 /
                 <div className={"font-semibold"}>
@@ -44,9 +46,14 @@ export const ItemComponent = (props: ItemComponentProps) => {
                 </div>
             </div>
             <div className={"flex flex-row text-sm gap-3"}>
-                <button className={"p-0.5 ps-3 pe-3 rounded-md bg-blue-200"}>
-                    Выдать
-                </button>
+                <Protected>
+                    <button onClick={() => {
+                        setModalId(id)
+                        openModal('itemModal')
+                    }} className={"p-1.5 rounded-md bg-blue-200"}>
+                        <FaChevronRight/>
+                    </button>
+                </Protected>
             </div>
         </div>
     </div>

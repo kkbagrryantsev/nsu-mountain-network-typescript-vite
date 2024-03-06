@@ -1,0 +1,59 @@
+.dropdown {
+  position: relative;
+  width: fit-content;
+  height: fit-content;
+}
+
+.dropdown__dropdownToggle:hover {
+  cursor: pointer;
+}
+
+.dropdownMenu {
+  position: absolute;
+  right: 0;
+  margin-top: 8px;
+  width: max-content;
+  z-index: 1;
+  border-radius: 0.4rem;
+  background: white;
+  padding: 0;
+  opacity: 0;
+  pointer-events: none;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+}
+
+.dropdown.active .dropdownMenu {
+  padding: 0.3rem;
+  opacity: 1;
+  pointer-events: auto;
+  z-index: 999;
+}
+
+//TODO Separate styles on files
+.dropdown.active .dropdownMenu__dropdownItem, .dropdown.active .dropdownMenu__dropdownStaticItem {
+  display: flex;
+  user-select: none;
+}
+
+.dropdownMenu__dropdownItem, .dropdownMenu__dropdownStaticItem {
+  list-style: none;
+  display: none;
+  cursor: default;
+  user-select: none;
+  border-radius: 3px;
+  padding: 0.2rem;
+}
+
+.dropdownMenu__dropdownItem:hover {
+  background: #f1f1f1;
+  cursor: pointer;
+}
+
+.dropdownMenu__dropdownDivider {
+  height: 1.5px;
+  margin: 2px 5px;
+  background: #bebebe;
+}
+

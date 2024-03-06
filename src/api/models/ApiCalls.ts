@@ -8,6 +8,21 @@ export const apiGetItems = (page: number) => axios.get(`/api/models/items?page=$
     }
 })
 
+export const apiGetItem = (id: string) => axios.get(`/api/models/items/${id}`, {
+    headers: {
+        Authorization: `Bearer ${getAccessToken()}`,
+        'Content-Type': 'application/json'
+    }
+})
+
+export const apiApproveBookingRequest = (data: any) =>
+  axios.post("/api/models/items/use/approve", data, {
+      headers: {
+          Authorization: `Bearer ${getAccessToken()}`,
+          'Content-Type': 'application/json'
+      }
+  });
+
 // WAREHOUSEMAN OPTIONS, USERS OPERATIONS
 // export const apiGetAllUsers = () =>
 //   axios.get("/api/models/users", getAccessTokenHeader());

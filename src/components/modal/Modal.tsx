@@ -1,5 +1,5 @@
 import React, {useRef} from "react";
-import {useClickAway} from "react-use";
+import {useClickAway, useLockBodyScroll} from "react-use";
 import useBoundStore from "~/store/useBoundStore.ts";
 import "./styles/Modal.scss"
 import {IoCloseOutline} from "react-icons/io5";
@@ -21,8 +21,10 @@ export const Modal = (props: ModalProps) => {
     });
 
     if (!isActive) {
+        useLockBodyScroll(false)
         return null;
     }
+    useLockBodyScroll(true)
 
     return ReactDOM.createPortal(
         <div ref={modalRef} className={"modalBox"}>
