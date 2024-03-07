@@ -5,7 +5,7 @@ import {WithLoader} from "~/utils/WithLoader.ts";
 import {Item} from "~/model/Item.ts";
 import {apiGetItems} from "~/api/models/ApiCalls.ts";
 
-export interface WareSlice {
+export interface WarePageSlice {
     items: WithLoader<Item[]>
 
     page: number
@@ -13,7 +13,7 @@ export interface WareSlice {
     getItems: (page: number) => Promise<void>
 }
 
-export const createWareSlice: StateCreator<WareSlice> = set => ({
+export const createWarePageSlice: StateCreator<WarePageSlice> = set => ({
     items: {data: [], loading: LoadingState.LOADING},
     page: 1,
     getItems: async (page: number) => {

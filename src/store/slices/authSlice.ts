@@ -46,7 +46,7 @@ export const createAuthSlice: StateCreator<AuthSlice> = set => ({
 
     checkAuthentication: async () => {
         try {
-            set(_state => ({ isAuthenticated: { data: true, loading: LoadingState.LOADING } }))
+            set(_state => ({ isAuthenticated: { data: false, loading: LoadingState.LOADING } }))
 
             const response = await apiCheckAuthentication()
 

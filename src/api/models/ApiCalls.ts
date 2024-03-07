@@ -16,13 +16,43 @@ export const apiGetItem = (id: string) => axios.get(`/api/models/items/${id}`, {
 })
 
 export const apiApproveBookingRequest = (data: any) =>
-  axios.post("/api/models/items/use/approve", data, {
-      headers: {
-          Authorization: `Bearer ${getAccessToken()}`,
-          'Content-Type': 'application/json'
-      }
-  });
+    axios.post("/api/models/items/use/approve", data, {
+        headers: {
+            Authorization: `Bearer ${getAccessToken()}`,
+            'Content-Type': 'application/json'
+        }
+    });
 
+export const apiRejectBookingRequest = (data: any) =>
+    axios.post("/api/models/items/use/reject", data, {
+        headers: {
+            Authorization: `Bearer ${getAccessToken()}`,
+            'Content-Type': 'application/json'
+        }
+    });
+
+export const apiGiveItemByBookingRequest = (data: any) =>
+    axios.post("/api/models/items/use/give", data, {
+        headers: {
+            Authorization: `Bearer ${getAccessToken()}`,
+            'Content-Type': 'application/json'
+        }
+    });
+
+export const apiReturnItem = (data: any) =>
+    axios.post("/api/models/items/use/return", data, {
+        headers: {
+            Authorization: `Bearer ${getAccessToken()}`,
+            'Content-Type': 'application/json'
+        }
+    });
+
+export const apiGetUserById = (userId: string) => axios.get(`/api/models/users/${userId}`, {
+    headers: {
+        Authorization: `Bearer ${getAccessToken()}`,
+        'Content-Type': 'application/json'
+    }
+})
 // WAREHOUSEMAN OPTIONS, USERS OPERATIONS
 // export const apiGetAllUsers = () =>
 //   axios.get("/api/models/users", getAccessTokenHeader());

@@ -1,6 +1,8 @@
+import {UseRecordState} from "~/enums/UseRecordState.ts";
+
 export interface UseRecord {
     id: string
-    isConfirmed: boolean
+    isConfirmed: UseRecordState
     itemId: string
     quantity: number
     userId: string

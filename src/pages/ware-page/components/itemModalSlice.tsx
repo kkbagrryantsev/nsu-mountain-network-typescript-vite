@@ -24,7 +24,6 @@ export const createItemModalSlice: StateCreator<ItemModalSlice> = set => ({
             const statusCode = response.status
 
             if (statusCode === 200) {
-                console.log(response.data)
                 const {item: rawItem, item_data: rawUseData}: {item: any, item_data: any[]} = response.data
                 const {
                     item_id: id,
