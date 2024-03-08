@@ -1,19 +1,17 @@
 import {Item} from "~/model/Item.ts";
 import {FaChevronRight} from "react-icons/fa";
 import {Protected} from "~/components/protected/Protected.tsx";
-import React from "react";
 import useBoundStore from "~/store/useBoundStore.ts";
 import {CostFormatter} from "~/utils/CostFormatter.ts";
 
 interface ItemComponentProps {
     item: Item
-    setModalId: React.Dispatch<any>
 }
 
 export const ItemComponent = (props: ItemComponentProps) => {
     const openModal = useBoundStore(state => state.openModal)
 
-    const {item, setModalId} = props
+    const {item} = props
     const {id, name, categoryId, totalQuantity, availableQuantity, cost, weight} = item
 
     return <div className={"flex flex-col gap-2 p-4 bg-gray-100 border border-gray-300 rounded-xl"}>
@@ -48,8 +46,7 @@ export const ItemComponent = (props: ItemComponentProps) => {
             <div className={"flex flex-row text-sm gap-3"}>
                 <Protected>
                     <button onClick={() => {
-                        setModalId(id)
-                        openModal('itemModal')
+                        openModal('itemModal', {itemId: id})
                     }} className={"p-1.5 rounded-md bg-blue-200"}>
                         <FaChevronRight/>
                     </button>

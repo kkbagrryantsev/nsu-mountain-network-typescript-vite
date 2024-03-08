@@ -1,9 +1,10 @@
 import useBoundStore from "~/store/useBoundStore.ts";
 import {Item} from "~/model/Item.ts";
 import {ItemComponent} from "~/pages/ware-page/components/Item.tsx";
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useRef} from "react";
 import {LoadingState} from "~/enums/LoadingState.ts";
 import {ItemModal} from "~/pages/ware-page/components/ItemModal.tsx";
+import {ItemGiveModal} from "~/pages/ware-page/components/ItemGiveModal.tsx";
 
 export const ItemsList = () => {
     const itemsLoader = useBoundStore(state => state.items)
@@ -36,11 +37,10 @@ export const ItemsList = () => {
 
     const items = itemsLoader.data || []
 
-    const [modalId, setModalId] = useState<string>()
-
     return <div className={"grid sm:grid-cols-1 md:grid-cols-2 gap-2"}>
-        {items.map((item: Item) => <ItemComponent setModalId={setModalId} item={item} key={item.id}/>)}
-        <ItemModal itemId={modalId}/>
+        {items.map((item: Item) => <ItemComponent item={item} key={item.id}/>)}
+        <ItemModal />
+        <ItemGiveModal />
         <div ref={observerRef}/>
     </div>
 }

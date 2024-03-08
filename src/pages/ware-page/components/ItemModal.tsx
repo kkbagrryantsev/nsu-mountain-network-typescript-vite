@@ -12,25 +12,30 @@ import DropdownItem from "~/components/dropdown/DropdownItem.tsx";
 import {UseRecordState} from "~/enums/UseRecordState.ts";
 import {useGetUsername} from "~/hooks/useGetUsername.ts";
 import {LoadingState} from "~/enums/LoadingState.ts";
+import {FaPlus} from "react-icons/fa6";
 
-interface ItemModalProps {
-    itemId?: string
-}
+export const ItemModal = () => {
+    const currentModal = useBoundStore(state => state.modals['itemModal'])
 
-export const ItemModal = (props: ItemModalProps) => {
-    const {itemId} = props
-
-    if (itemId == null) {
-        return
-    }
-
+    const itemUseRecordsLoader = useBoundStore(state => state.useData)
     const itemLoader = useBoundStore(state => state.item)
-    const itemUseHistoryLoader = useBoundStore(state => state.useData)
     const getItem = useBoundStore(state => state.getItem)
+    const openModal = useBoundStore(state => state.openModal)
+    const closeModal = useBoundStore(state => state.closeModal)
 
     useEffect(() => {
+        if (currentModal === undefined) {
+            return
+        }
+        const {itemId} = currentModal
         void getItem(itemId)
-    }, [itemId, getItem]);
+    }, [currentModal, getItem]);
+
+    const onGiveItemClick = () => {
+        const {itemId} = currentModal
+        openModal('itemGiveModal', {itemId})
+        closeModal('itemModal')
+    }
 
     return <Modal id={'itemModal'}>
         <div className={"bg-white md:w-screen max-w-[50rem] p-4 rounded-xl"}>
@@ -47,10 +52,17 @@ export const ItemModal = (props: ItemModalProps) => {
                                             {itemLoader.data?.name}
                                         </ComponentWithLoader>
                                     </div>
+                                    <div
+                                        className={`${itemLoader.data?.description === "" && "text-gray-400"} text-sm font-mono`}>
+                                        <ComponentWithLoader onLoading={<></>} onError={<></>}
+                                                             loading={itemLoader.loading}>
+                                            {itemLoader.data?.description || "Без описания"}
+                                        </ComponentWithLoader>
+                                    </div>
                                     <div className={"text-sm text-gray-500"}>
                                         <ComponentWithLoader onLoading={<></>} onError={<></>}
                                                              loading={itemLoader.loading}>
-                                            ID категории: {itemLoader.data?.categoryId}
+                                            Категория: #{itemLoader.data?.categoryId}
                                         </ComponentWithLoader>
                                     </div>
                                     <div className={"text-sm text-gray-500"}>
@@ -65,11 +77,6 @@ export const ItemModal = (props: ItemModalProps) => {
                                             Вес: {itemLoader.data?.weight} кг
                                         </ComponentWithLoader>
                                     </div>
-                                </div>
-                                <div>
-                                    <ComponentWithLoader onLoading={<></>} onError={<></>} loading={itemLoader.loading}>
-                                        {itemLoader.data?.description}
-                                    </ComponentWithLoader>
                                 </div>
                             </div>
                             {/*<div className={"flex flex-row gap-2"}>*/}
@@ -94,7 +101,13 @@ export const ItemModal = (props: ItemModalProps) => {
                     <div className={"text-lg font-semibold"}>История выдачи</div>
                     <div className={"grid sm:grid-cols-1 md:grid-cols-3 gap-2"}>
                         <ComponentWithLoader onLoading={<></>} onError={<></>} loading={itemLoader.loading}>
-                            {itemUseHistoryLoader.data.sort((a: UseRecord, b: UseRecord) => {
+                            <div onClick={onGiveItemClick} className={"flex flex-col justify-center items-center border-2 border-blue-200 hover:border-blue-400 hover:cursor-pointer border-dashed rounded-xl"}>
+                                <FaPlus fill={"skyBlue"} size={40}/>
+                                <div className={"text-sm font-medium text-sky-400"}>
+                                    Выдать
+                                </div>
+                            </div>
+                            {itemUseRecordsLoader.data.sort((a: UseRecord, b: UseRecord) => {
                                 return a.isConfirmed < b.isConfirmed
                             }).map((useRecord: UseRecord) => <ItemUseRecord
                                 useRecord={useRecord} key={useRecord.id}/>)}
@@ -142,48 +155,48 @@ const ItemUseRecord = (props: ItemUseRecordProps) => {
     const usernameLoader = useGetUsername(userId)
 
     return <div
-        className={`${isConfirmed === UseRecordState.RETURNED ? "opacity-60" : ""} flex flex-col bg-gray-100 p-3 rounded-xl gap-1.5 max-w-72`}>
+        className={`${isConfirmed === UseRecordState.RETURNED && "opacity-60"} flex flex-col bg-gray-100 p-3 rounded-xl gap-1.5 max-w-72`}>
         <div className={"flex flex-row justify-between"}>
             <div className={"text-xs font-medium text-gray-400"}>
                 {useRecordState} #{id}
             </div>
             <div className={"pt-0.5"}>
-                {isConfirmed !== UseRecordState.RETURNED ? <Dropdown>
+                {isConfirmed !== UseRecordState.RETURNED && <Dropdown>
                     <DropdownToggle>
                         <SlOptionsVertical fill={"gray"}/>
                     </DropdownToggle>
                     <DropdownMenu>
-                        {isConfirmed === UseRecordState.GIVEN ? <DropdownItem>
+                        {isConfirmed === UseRecordState.GIVEN && <DropdownItem>
                             <div
                                 role={"button"}
                                 onClick={() => returnItem(id, quantity)}
                                 className={"text-sm font-medium"}>
                                 Подтвердить полный возврат
                             </div>
-                        </DropdownItem> : null}
-                        {isConfirmed === UseRecordState.BOOKED ? <DropdownItem>
+                        </DropdownItem>}
+                        {isConfirmed === UseRecordState.BOOKED && <DropdownItem>
                             <div
                                 role={"button"}
                                 onClick={() => giveItemByBookingRequest(id)}
                                 className={"text-sm font-medium"}>
                                 Выдать снаряжение
                             </div>
-                        </DropdownItem> : null}
-                        {isConfirmed === UseRecordState.REQUESTED ? <DropdownItem>
+                        </DropdownItem>}
+                        {isConfirmed === UseRecordState.REQUESTED && <DropdownItem>
                             <div
                                 role={"button"}
                                 onClick={() => approveItemBookingRequest(id)}
                                 className={"text-sm font-medium"}>
                                 Одобрить заявку
                             </div>
-                        </DropdownItem> : null}
-                        {isConfirmed === UseRecordState.REQUESTED ? <DropdownItem>
+                        </DropdownItem>}
+                        {isConfirmed === UseRecordState.REQUESTED && <DropdownItem>
                             <div role={"button"} onClick={() => rejectItemBookingRequest(id)}
                                  className={"text-sm font-medium"}>Отклонить заявку
                             </div>
-                        </DropdownItem> : null}
+                        </DropdownItem>}
                     </DropdownMenu>
-                </Dropdown> : null}
+                </Dropdown>}
             </div>
         </div>
 

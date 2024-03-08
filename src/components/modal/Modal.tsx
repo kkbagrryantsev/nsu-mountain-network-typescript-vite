@@ -13,16 +13,17 @@ interface ModalProps {
 export const Modal = (props: ModalProps) => {
     const {id, children} = props
     const modalRef = useRef(null)
-    const isActive = useBoundStore(state => state.modals[id])
+
+    const currentModal = useBoundStore(state => state.modals[id])
 
     const closeModal = useBoundStore(state => state.closeModal)
     useClickAway(modalRef, () => {
         closeModal(id);
     });
 
-    if (!isActive) {
+    if (currentModal === undefined) {
         useLockBodyScroll(false)
-        return null;
+        return null
     }
     useLockBodyScroll(true)
 
